@@ -18,6 +18,7 @@ namespace :cd do
     :build_number,
     :infrastructure_name,
     :operating_system_name,
+    :operating_system_version,
     :agent_name,
     :bosh_target,
     :environment_name,
