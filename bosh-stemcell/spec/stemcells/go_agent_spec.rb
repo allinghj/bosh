@@ -10,7 +10,6 @@ describe 'Stemcell with Go Agent' do
     end
 
     {
-        '/var/lock' => { mode: '770', owner: 'root', group: 'vcap' },
         '/etc/cron.allow' => { mode: '640', owner: 'root', group: 'vcap' },
         '/etc/at.allow' => { mode: '640', owner: 'root', group: 'vcap' },
     }.each do |file_name, properties|
@@ -21,6 +20,26 @@ describe 'Stemcell with Go Agent' do
         it { should be_grouped_into(properties[:group]) }
       end
     end
+
+    describe '/var/lock' do
+      subject { backend.run_command("stat -L -c %#{operator} /var/lock")[:stdout].split.first }
+
+      describe 'owned by' do
+        let(:operator) { 'U' }
+        it { should eq('root') }
+      end
+
+      describe 'mode' do
+        let(:operator) { 'a' }
+        it { should eq('770') }
+      end
+
+      describe 'grouped into' do
+        let(:operator) { 'G' }
+        it { should eq('vcap') }
+      end
+    end
+
 
     %w(/etc/cron.allow /etc/at.allow).each do |allow_file|
       describe file(allow_file) do
